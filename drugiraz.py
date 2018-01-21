@@ -47,7 +47,6 @@ class AudioStream(object):
             title='VISUALIZATION', row=3, col=1, axisItems={'bottom': sp_xaxis},
         )
 
-
         # pyaudio stuff
         self.FORMAT = pyaudio.paInt16
         self.CHANNELS = 1
@@ -67,8 +66,13 @@ class AudioStream(object):
         # waveform and spectrum x points
         self.x, self.fx = self.getXandFX()
         self.y, self.fy = self.getYandFY()
-        self.intensity = 0
+        self.vis2x, self.vis2y = self.getVis2Params()
 
+        self.max_intensity = 0
+        self.max_sig = 0
+
+    def getVis2Params(self):
+        return np.arange(0, self.CHUNK), np.arange(0, self.CHUNK)
 
     def getXandFX(self):
         x = np.linspace(0, self.CHUNK / self.RATE, self.CHUNK)
@@ -84,10 +88,14 @@ class AudioStream(object):
         if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
             QtGui.QApplication.instance().exec_()
 
-
     def set_plotdata(self, name, data_x, data_y, pen):
         if name in self.traces:
             if name == 'visualization1':
+                #pen = pg.mkPen(color=(random.randint(1, 255), random.randint(1, 255), random.randint(1, 255)))
+                self.traces[name].setPen(pen)
+                self.traces[name].setData(data_x, data_y)
+            elif name == 'visualization2':
+                #pen = pg.mkPen(color=(random.randint(1, 255), random.randint(1, 255), random.randint(1, 255)))
                 self.traces[name].setPen(pen)
                 self.traces[name].setData(data_x, data_y)
             else:
@@ -95,18 +103,19 @@ class AudioStream(object):
         else:
             if name == 'waveform':
                 self.traces[name] = self.waveform.plot(pen='c', width=3)
-                self.waveform.setYRange(-2**15, 2**15, padding=0)
+                self.waveform.setYRange(-2 ** 15, 2 ** 15, padding=0)
                 self.waveform.setXRange(0, max(self.x), padding=0.005)
             if name == 'spectrum':
                 pen = pg.mkPen(color=(0, 150, 0))
                 self.traces[name] = self.spectrum.plot(pen=pen, width=3)
-                # self.spectrum.setLogMode(x=True, y=True)
-                # self.spectrum.setYRange(0, 6, padding=0)
-                # self.spectrum.setXRange(
-                #     np.log10(20), np.log10(self.RATE / 2), padding=0.005)
 
             if name == 'visualization1':
-                self.traces[name] = self.visualization.plot(pen='c', width=30)
+                self.traces[name] = self.visualization.plot(pen='c')
+
+            if name == 'visualization2':
+                self.traces[name] = self.visualization.plot(pen='c')
+                self.visualization.setYRange(0, self.CHUNK)
+                self.visualization.setXRange(0, self.CHUNK)
 
     def update(self):
         wf_data = self.stream.read(self.CHUNK)
@@ -121,21 +130,51 @@ class AudioStream(object):
         self.fy = np.where(self.fy > 11, self.fy, 1)
         self.set_plotdata(name='spectrum', data_x=self.fx, data_y=self.fy, pen='c')
 
-        v1x, v1y, pen = self.getVisualization1(self.fx, self.fy)
-        self.set_plotdata("visualization1", v1x, v1y, pen)
+        v1x, v1y, pen1 = self.visualize1(self.fx, self.fy)
+        self.set_plotdata("visualization1", v1x, v1y, pen1)
 
-    def getVisualization1(self, x, y):
-        vx = np.arange(128)
-        vy = np.zeros(128)
-        for i in range(128):
-            vy[i] = np.mean(y[i*y.shape[0]//128 : (i+1)*y.shape[0]//128])
+        # v2x, v2y, pen2 = self.visualize2(self.vis2x, self.vis2y)
+        # self.set_plotdata("visualization2", v2x, v2y, pen2)
 
-        intensityTmp = np.mean(vy)
-        self.intensity *= 0.95
-        self.intensity = max(self.intensity, intensityTmp)
-        r = 255 * intensityTmp / self.intensity
-        pen = pg.mkPen(color=(r, 128, 255-r))
-        return vx, vy, pen
+    def visualize1(self, x, y):
+        vx = np.arange(100)
+        vy = np.zeros(100)
+        for i in range(100):
+            vy[i] = np.mean(y[i * y.shape[0] // 100: (i + 1) * y.shape[0] // 100])
+
+        intensity = np.mean(self.fy)
+        self.max_intensity = max(intensity, self.max_intensity)
+        r = int(255 * intensity / self.max_intensity)
+
+        self.max_intensity *= 0.999
+        return vx, vy, pg.mkPen(color=(r, 30, 255 - r))
+
+    def visualize2(self, vx, vy):
+        new_max_sig = np.max(self.y)
+        if new_max_sig > self.max_sig:
+            self.max_sig = new_max_sig
+            beginning = np.argmax(self.fy[self.CHUNK // 4:self.CHUNK // 2])
+            beginning = 4 * beginning
+            rise = self.CHUNK - vy[beginning]
+            vy[beginning] = self.CHUNK
+            val = rise
+            for i in range(beginning + 1, self.CHUNK):
+                vy[i] = min(self.CHUNK * 2, vy[i] + val)
+                val *= 0.9
+            val = rise
+            for i in range(beginning - 1, 0, -1):
+                vy[i] = min(self.CHUNK * 2, vy[i] + val)
+                val *= 0.9
+        for i in range(self.CHUNK):
+            vy[i] *= 0.95
+
+        intensity = np.mean(self.fy)
+        self.max_intensity = max(intensity, self.max_intensity)
+        r = int(255 * intensity / self.max_intensity)
+
+        self.max_intensity *= 0.999
+        self.max_sig *= 0.9
+        return vx, vy, pg.mkPen(color=(r, 30, 255 - r))
 
     def animation(self):
         timer = QtCore.QTimer()
@@ -145,6 +184,5 @@ class AudioStream(object):
 
 
 if __name__ == '__main__':
-
     audio_app = AudioStream()
     audio_app.animation()
