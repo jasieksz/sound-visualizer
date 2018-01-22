@@ -12,8 +12,9 @@ import time
 
 
 class AudioStream(object):
-    def __init__(self, visId=1):
-
+    def __init__(self, visId=1, signalFlag=True, spectrumFlag=True):
+        self.signalFlag = signalFlag
+        self.spectrumFlag = spectrumFlag
         # pyqtgraph stuff
         pg.setConfigOptions(antialias=True)
         self.visualizationId = visId
@@ -22,6 +23,7 @@ class AudioStream(object):
         self.win = pg.GraphicsWindow(title='Spectrum Analyzer')
         self.win.setWindowTitle('Spectrum Analyzer')
         self.win.setGeometry(5, 115, 1910, 1070)
+
 
         wf_xlabels = [(0, '0'), (2048, '2048'), (4096, '4096')]
         wf_xaxis = pg.AxisItem(orientation='bottom')
@@ -38,12 +40,14 @@ class AudioStream(object):
         sp_xaxis = pg.AxisItem(orientation='bottom')
         sp_xaxis.setTicks([sp_xlabels])
 
-        self.waveform = self.win.addPlot(
-            title='WAVEFORM', row=1, col=1, axisItems={'bottom': wf_xaxis, 'left': wf_yaxis},
-        )
-        self.spectrum = self.win.addPlot(
-            title='SPECTRUM', row=2, col=1, axisItems={'bottom': sp_xaxis},
-        )
+        if self.signalFlag:
+            self.waveform = self.win.addPlot(
+                title='WAVEFORM', row=1, col=1, axisItems={'bottom': wf_xaxis, 'left': wf_yaxis},
+            )
+        if self.spectrumFlag:
+            self.spectrum = self.win.addPlot(
+                title='SPECTRUM', row=2, col=1, axisItems={'bottom': sp_xaxis},
+            )
         self.visualization = self.win.addPlot(
             title='VISUALIZATION', row=3, col=1, axisItems={'bottom': sp_xaxis},
         )
@@ -92,21 +96,24 @@ class AudioStream(object):
     def set_plotdata(self, name, data_x, data_y, pen):
         if name in self.traces:
             if self.visualizationId == 1 and name == 'visualization1':
-                #pen = pg.mkPen(color=(random.randint(1, 255), random.randint(1, 255), random.randint(1, 255)))
                 self.traces[name].setPen(pen)
                 self.traces[name].setData(data_x, data_y)
             elif self.visualizationId == 2 and name == 'visualization2':
-                #pen = pg.mkPen(color=(random.randint(1, 255), random.randint(1, 255), random.randint(1, 255)))
                 self.traces[name].setPen(pen)
                 self.traces[name].setData(data_x, data_y)
+            elif self.visualizationId == 3 and name == 'visualization3':
+                #
+                # ADD YOUR CODE HERE
+                #
+                pass
             else:
                 self.traces[name].setData(data_x, data_y)
         else:
-            if name == 'waveform':
+            if self.signalFlag and name == 'waveform':
                 self.traces[name] = self.waveform.plot(pen='c', width=3)
                 self.waveform.setYRange(-2 ** 15, 2 ** 15, padding=0)
                 self.waveform.setXRange(0, max(self.x), padding=0.005)
-            if name == 'spectrum':
+            if self.spectrumFlag and name == 'spectrum':
                 pen = pg.mkPen(color=(0, 150, 0))
                 self.traces[name] = self.spectrum.plot(pen=pen, width=3)
 
@@ -118,18 +125,26 @@ class AudioStream(object):
                 self.visualization.setYRange(0, self.CHUNK)
                 self.visualization.setXRange(0, self.CHUNK)
 
+            if self.visualizationId == 3 and name == 'visualization3':
+                #
+                # ADD YOUR CODE HERE
+                #
+                pass
+
     def update(self):
         wf_data = self.stream.read(self.CHUNK)
         wf_data = struct.unpack("%dh" % self.CHUNK, wf_data)
         self.y = self.y * self.SMOOTHING
         self.y += np.array(wf_data) * (1 - self.SMOOTHING)
-        self.set_plotdata(name='waveform', data_x=self.x, data_y=self.y, pen='m')
+        if self.signalFlag:
+            self.set_plotdata(name='waveform', data_x=self.x, data_y=self.y, pen='m')
 
         transformed = (np.abs(np.fft.fft(self.y)) * np.blackman(self.CHUNK)).clip(min=1)
         self.fy = self.fy * self.SMOOTHING
         self.fy += (1 - self.SMOOTHING) * transformed
         self.fy = np.where(self.fy > 11, self.fy, 1)
-        self.set_plotdata(name='spectrum', data_x=self.fx, data_y=self.fy, pen='c')
+        if self.spectrumFlag:
+            self.set_plotdata(name='spectrum', data_x=self.fx, data_y=self.fy, pen='c')
 
         if self.visualizationId == 1:
             v1x, v1y, pen1 = self.visualize1(self.fx, self.fy)
@@ -137,6 +152,11 @@ class AudioStream(object):
         elif self.visualizationId == 2:
             v2x, v2y, pen2 = self.visualize2(self.vis2x, self.vis2y)
             self.set_plotdata("visualization2", v2x, v2y, pen2)
+        elif self.visualizationId == 3:
+            pass
+            #
+            # ADD YOUR CODE HERE
+            #
 
     def visualize1(self, x, y):
         vx = np.arange(100)
@@ -178,13 +198,20 @@ class AudioStream(object):
         self.max_sig *= 0.9
         return vx, vy, pg.mkPen(color=(r, 30, 255 - r))
 
-    def animation(self):
+    def visualize3(self, vx, vy):
+        #
+        # ADD YOUR CODE HERE
+        #
+        return vx, vy, pg.mkPen(color=(0, 0, 0))
+
+
+    def animation(self, time):
         timer = QtCore.QTimer()
         timer.timeout.connect(self.update)
-        timer.start(20)
+        timer.start(time)
         self.start()
 
 
 if __name__ == '__main__':
-    audio_app = AudioStream(2)
-    audio_app.animation()
+    audio_app = AudioStream(2, True, True)
+    audio_app.animation(120)
