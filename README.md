@@ -2,7 +2,8 @@
 
 # Dokumentacja użytkowa projektu sound-visualizer
 Wizualizacja muzyki w czasie rzeczywistym przy wykorzystaniu Raspberry Pi i Pythona
-![](resources/all_example.png)
+
+![sound-visualizer](resources/all_example.png)
 
 # Wymagania sprzętowe i technologiczne
 ## Sprzęt
@@ -68,13 +69,20 @@ Podaj odpowiednie opcje
 ### Dostępne tryby wizualizacji
 
 - należy wybrać opcję signal=True
-	![sygnał](resources/singal_example.png)
+
+![sygnał](resources/singal_example.png)
+
 - należy wybrać opcję spectrum=True
-	![spektrum](resources/specturm_example.png)
+
+![spektrum](resources/specturm_example.png)
+
 - należy wybrać opcję visualizationId=1 
-	![wizualizacja 1](resources/vis1_example.png)
+
+![wizualizacja 1](resources/vis1_example.png)
+
 - należy wybrać opcję visualizationId=2 
-	![wizualizacja 2](resources/vis2_example.png)
+
+![wizualizacja 2](resources/vis2_example.png)
 
 # Podsumowanie
 Jeżeli napotkasz problemy z sprzętem lub oprogramowaniem [otwórz nowy issue](https://github.com/jasieksz/sound-visualizer/issues).
