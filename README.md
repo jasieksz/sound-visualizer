@@ -3,7 +3,7 @@
 # Dokumentacja użytkowa projektu sound-visualizer
 Wizualizacja muzyki w czasie rzeczywistym przy wykorzystaniu Raspberry Pi i Pythona
 
-![sound-visualizer](https://github.com/jasieksz/sound-visualizer/blob/master/resources/example_gif.gif)
+![sound-visualizer](https://github.com/jasieksz/sound-visualizer/blob/master/resources/run_example.gif)
 
 # Wymagania sprzętowe i technologiczne
 ## Sprzęt
