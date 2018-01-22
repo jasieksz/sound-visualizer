@@ -26,11 +26,14 @@ Wizualizacja muzyki w czasie rzeczywistym przy wykorzystaniu Raspberry Pi i Pyth
 
 ## Instalacja dodatkowych modułów dla Raspberry Pi
 - [Alsa](http://blog.scphillips.com/posts/2013/01/sound-configuration-on-raspberry-pi-with-alsa/)  (zainstalowane domyślnie z systemem)
- ```
+
+W terminalu wykonaj komendę :
+```
 sudo apt-get install alsa-utils
 ```
 
 ## Instalacja dodatkowych bibliotek pythona
+W terminalu wykonaj komendy :
 ```
 sudo apt-get update
 sudo apt-get install python-numpy python-scipy python-pyaudio
@@ -56,18 +59,21 @@ sudo apt-get install python-pyqtgraph
 # Obsługa aplikacji
 Kiedy poprawnie skonfigurujesz sprzęt i system. 
 1. Odtwórz swoją ulubioną płytę
-2. Rozluźnij się xD
-3. Uruchom wizualizację
+2. Uruchom wizualizację
 ## Uruchomienie wizualizacji
 Uruchom program [visualizer.py](https://github.com/jasieksz/sound-visualizer/blob/master/visualizer.py) wykonując w terminalu komendę :
+
 ```python visualizer.py```
-Otworzy się okno aplikacji .... i coś fajnego się stanie
+
+Otworzy się okno aplikacji, w dalszych krokach możesz ustawić dodatkowe opcje
 ## Ustawienia i zmiana trybu wizualizacji
 Podaj odpowiednie opcje
+
 ``` python visualizer.py -visualiztionId=1 -time=100 -signal=True -spectrum=True```
 
-### Dostępne tryby wizualizacji
+time jest to okres czasu działania programu w sekundach
 
+### Dostępne tryby wizualizacji
 - należy wybrać opcję signal=True
 
 ![sygnał](https://github.com/jasieksz/sound-visualizer/blob/master/resources/signal_example.PNG)
