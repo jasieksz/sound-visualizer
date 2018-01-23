@@ -5,7 +5,6 @@ import pyqtgraph as pg
 import struct
 import pyaudio
 import random
-from scipy.fftpack import fft
 
 import sys
 import time
@@ -22,7 +21,7 @@ class AudioStream(object):
         self.app = QtGui.QApplication(sys.argv)
         self.win = pg.GraphicsWindow(title='Spectrum Analyzer')
         self.win.setWindowTitle('Spectrum Analyzer')
-        self.win.setGeometry(5, 115, 1910, 1070)
+        self.win.setGeometry(5, 115, 600, 400)
 
         self.init_pg()
         self.init_pyaudio(audio_format, time)
@@ -148,7 +147,7 @@ class AudioStream(object):
             #
 
     def update_signal(self):
-        wf_data = self.stream.read(self.CHUNK)
+        wf_data = self.stream.read(self.CHUNK, exception_on_overflow=False)
         wf_data = struct.unpack("%dh" % self.CHUNK, wf_data)
         self.y = self.y * self.wave_smoothing
         self.y += np.array(wf_data) * (1 - self.wave_smoothing)
