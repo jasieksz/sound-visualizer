@@ -63,13 +63,13 @@ Kiedy poprawnie skonfigurujesz sprzęt i system.
 ## Uruchomienie wizualizacji
 Uruchom program [visualizer.py](https://github.com/jasieksz/sound-visualizer/blob/master/visualizer.py) wykonując w terminalu komendę :
 
-```python visualizer.py```
+```python3 visualizer.py```
 
 Otworzy się okno aplikacji, w dalszych krokach możesz ustawić dodatkowe opcje
 ## Ustawienia i zmiana trybu wizualizacji
 Podaj odpowiednie opcje
 
-``` python visualizer.py -vis 1 -time 100 --signal True --spectrum True -format Int16```
+``` python3 visualizer.py -vis 1 -time 100 --signal True --spectrum True -format Int16```
 
 time jest to okres czasu działania programu w sekundach
 format jest to typ wartości zwracanych przez mikrofon
