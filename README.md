@@ -69,24 +69,25 @@ Otworzy się okno aplikacji, w dalszych krokach możesz ustawić dodatkowe opcje
 ## Ustawienia i zmiana trybu wizualizacji
 Podaj odpowiednie opcje
 
-``` python visualizer.py -visualiztionId=1 -time=100 -signal=True -spectrum=True```
+``` python visualizer.py -vis 1 -time 100 --signal True --spectrum True -format Int16```
 
 time jest to okres czasu działania programu w sekundach
+format jest to typ wartości zwracanych przez mikrofon
 
 ### Dostępne tryby wizualizacji
-- należy wybrać opcję signal=True
+- należy wybrać opcję signal True
 
 ![sygnał](https://github.com/jasieksz/sound-visualizer/blob/master/resources/signal_example.PNG)
 
-- należy wybrać opcję spectrum=True
+- należy wybrać opcję spectrum True
 
 ![spektrum](https://github.com/jasieksz/sound-visualizer/blob/master/resources/specturm_example.PNG)
 
-- należy wybrać opcję visualizationId=1 
+- należy wybrać opcję vis 1 
 
 ![wizualizacja 1](https://github.com/jasieksz/sound-visualizer/blob/master/resources/vis1_example.PNG)
 
-- należy wybrać opcję visualizationId=2 
+- należy wybrać opcję vis 2 
 
 ![wizualizacja 2](https://github.com/jasieksz/sound-visualizer/blob/master/resources/vis2_example.PNG)
 
